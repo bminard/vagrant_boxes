@@ -1,0 +1,51 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "boot_command": [
+          "<esc><wait>",
+          "linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/{{user `installer_conf`}}",
+          "<enter><wait>"
+      ],
+      "boot_wait": "5s",
+      "guest_os_type": "RedHat_64",
+      "guest_additions_mode": "disable",
+      "headless": false,
+      "http_directory": "http",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "sha256",
+      "iso_url": "{{user `iso_url`}}",
+      "ssh_username": "vagrant",
+      "ssh_private_key_file": "{{user `ssh_private_key`}}",
+      "ssh_port": 22,
+      "ssh_timeout": "600s",
+      "shutdown_command": "echo 'vagrant' | sudo -S /sbin/shutdown -hP now",
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--usb", "on" ],
+        [ "modifyvm", "{{.Name}}", "--memory", "1024" ],
+        [ "modifyvm", "{{.Name}}", "--cpus", "1" ]
+      ],
+      "vm_name": "centos-x86_64"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+      "scripts": [
+        "scripts/vagrant.sh",
+        "scripts/zerofill_disk.sh"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "include": [
+        "credentials/vagrant_ssh_key"
+      ],
+      "compression_level": "9",
+      "output": "centos-x86_64_{{.Provider}}.box"
+    }
+  ]
+}

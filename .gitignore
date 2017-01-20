@@ -1,0 +1,7 @@
+*.box
+Vagrantfile
+credentials
+http
+output-virtualbox-iso
+packer_cache
+timestamp.*
