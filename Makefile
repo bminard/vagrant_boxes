@@ -54,8 +54,8 @@ ${VAGRANT_PRIVATE_KEY} ${VAGRANT_PUBLIC_KEY}: | ${CREDENTIALS_DIR}
 
 
 BUILDER=$(shell packer inspect ${PACKER_TEMPLATE} | sed -ne '/^$$/d' -Ee 's/[[:space:]]*//g' -Ee '/^Builders:/,/^[[:alnum:]]+:/p' | sed -e '/^.*:/d')
-VAGRANT_BOX=centos-x86_64_virtualbox.box
-VAGRANT_BOX_NAME=centos
+VAGRANT_BOX_NAME=centos-x86_64
+VAGRANT_BOX=${VAGRANT_BOX_NAME}_virtualbox.box
 .PHONY: add-box create-box destroy-box halt-box
 add-box: destroy-box create-box
 	vagrant box add --force --name ${VAGRANT_BOX_NAME} file://${VAGRANT_BOX}
@@ -71,7 +71,10 @@ Vagrantfile: Vagrantfile.sed
 .PHONY: virtualbox-iso
 virtualbox-iso: ${VAGRANT_BOX}
 ${VAGRANT_BOX}: ${PACKER_VARS} ${PACKER_TEMPLATE} ${VAGRANT_PRIVATE_KEY}
-	packer build -var 'ssh_private_key=${VAGRANT_PRIVATE_KEY}' -var-file=${PACKER_VARS} ${PACKER_TEMPLATE}
+	packer build -var 'ssh_private_key=${VAGRANT_PRIVATE_KEY}' \
+	        -var 'vm_name=${VAGRANT_BOX_NAME}' \
+	        -var 'box_name=${VAGRANT_BOX}' \
+		-var-file=${PACKER_VARS} ${PACKER_TEMPLATE}
 destroy-box: halt-box
 	! [ -f Vagrantfile ] || vagrant destroy --force
 
@@ -89,7 +92,8 @@ PRESEED_CONF_FILE=$(shell sed -ne '/installer_conf/p' ${PACKER_VARS} | sed -Ee '
 PRESEED_CONF=${PRESEED_CONF_DIR}/${PRESEED_CONF_FILE}
 
 
-PACKER_TEMPLATE_PROVISIONERS=scripts/vagrant.sh
+PACKER_TEMPLATE_PROVISIONERS=scripts/vagrant.sh \
+	scripts/zerofill_disk.sh
 ${PACKER_TEMPLATE}: ${PRESEED_CONF} ${PACKER_TEMPLATE_PROVISIONERS}
 	touch $@
 ${PRESEED_CONF}: | ${PRESEED_CONF_DIR}
