@@ -42,8 +42,11 @@ ${CREDENTIALS_DIR}:
 	mkdir -pm 0700 $@ && chown ${WHOAMI}:${GROUP} $@
 
 
+MYSQL_PASSWORD?=${CREDENTIALS_DIR}/mysql_root_password
+REVIEW_BOARD_MYSQL_PASSWORD?=${CREDENTIALS_DIR}/review_board_mysql_password
+REVIEW_BOARD_ADMIN_PASSWORD?=${CREDENTIALS_DIR}/review_board_admin_password
 ROOT_PASSWORD?=${CREDENTIALS_DIR}/root_password
-${ROOT_PASSWORD}: | ${CREDENTIALS_DIR}
+${REVIEW_BOARD_ADMIN_PASSWORD} ${MYSQL_PASSWORD} ${REVIEW_BOARD_MYSQL_PASSWORD} ${ROOT_PASSWORD}: | ${CREDENTIALS_DIR}
 	openssl rand -hex 13 > $@ && chmod 0600 $@
 
 
@@ -92,8 +95,29 @@ PRESEED_CONF_FILE=$(shell sed -ne '/installer_conf/p' ${PACKER_VARS} | sed -Ee '
 PRESEED_CONF=${PRESEED_CONF_DIR}/${PRESEED_CONF_FILE}
 
 
-PACKER_TEMPLATE_PROVISIONERS=scripts/vagrant.sh \
-	scripts/zerofill_disk.sh
+MYSQL_CONF=scripts/mysql.sh
+REVIEW_BOARD_DATABASE=reviewboard
+REVIEW_BOARD_DATABASE_USER=reviewboard
+${MYSQL_CONF}: mysql.sh ${MYSQL_PASSWORD} ${REVIEW_BOARD_MYSQL_PASSWORD}
+	sh mysql.sh --dbuser ${REVIEW_BOARD_DATABASE_USER} \
+		--dbname ${REVIEW_BOARD_DATABASE} \
+		--rootpw ${MYSQL_PASSWORD} \
+		--rbpw ${REVIEW_BOARD_MYSQL_PASSWORD} > $@
+
+
+RB_SITE_CONF=scripts/rbsite.sh
+${RB_SITE_CONF}: rbsite.sh ${REVIEW_BOARD_ADMIN_PASSWORD} ${REVIEW_BOARD_MYSQL_PASSWORD}
+	sh rbsite.sh --admin ${REVIEW_BOARD_ADMIN_PASSWORD} \
+		--dbuser ${REVIEW_BOARD_DATABASE_USER} \
+		--dbname ${REVIEW_BOARD_DATABASE} \
+		--rbpw ${REVIEW_BOARD_MYSQL_PASSWORD} > $@
+
+
+PACKER_TEMPLATE_PROVISIONERS=${MYSQL_CONF} \
+	${RB_SITE_CONF} \
+	scripts/apache.sh \
+	scripts/reviewboard.sh \
+	scripts/vagrant.sh
 ${PACKER_TEMPLATE}: ${PRESEED_CONF} ${PACKER_TEMPLATE_PROVISIONERS}
 	touch $@
 ${PRESEED_CONF}: | ${PRESEED_CONF_DIR}
@@ -120,7 +144,7 @@ clean: destroy-box mostlyclean
 # Remove files that are created quickly.
 .PHONY: mostlyclean
 mostlyclean:
-	-rm ${PRESEED_CONF} ${TIMESTAMP}
+	-rm ${MYSQL_CONF} ${RB_SITE_CONF} ${PRESEED_CONF} ${TIMESTAMP}
 
 
 .PHONY: install python-virtual-environment virtual-box-additions

@@ -34,6 +34,9 @@
       "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
       "scripts": [
         "scripts/vagrant.sh",
+        "scripts/mysql.sh",
+        "scripts/apache.sh",
+        "scripts/reviewboard.sh",
         "scripts/zerofill_disk.sh"
       ]
     }
