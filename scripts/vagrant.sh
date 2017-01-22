@@ -30,6 +30,7 @@ function enable {
 enable firewalld.service
 
 
+yum update -y
 yum --assumeyes install sudo
 
 
