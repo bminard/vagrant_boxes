@@ -25,7 +25,7 @@
         [ "modifyvm", "{{.Name}}", "--memory", "1024" ],
         [ "modifyvm", "{{.Name}}", "--cpus", "1" ]
       ],
-      "vm_name": "centos-x86_64"
+      "vm_name": "{{user `vm_name`}}"
     }
   ],
   "provisioners": [
@@ -45,7 +45,7 @@
         "credentials/vagrant_ssh_key"
       ],
       "compression_level": "9",
-      "output": "centos-x86_64_{{.Provider}}.box"
+      "output": "{{user `box_name`}}"
     }
   ]
 }
