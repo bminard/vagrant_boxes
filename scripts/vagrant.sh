@@ -31,6 +31,12 @@ enable firewalld.service
 
 
 yum update -y
+
+
+# Install deltarpm package first.
+yum --assumeyes install deltarpm
+
+
 yum --assumeyes install sudo
 
 
