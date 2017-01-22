@@ -3,5 +3,6 @@ Vagrantfile
 credentials
 http
 output-virtualbox-iso
+output.*
 packer_cache
 timestamp.*
