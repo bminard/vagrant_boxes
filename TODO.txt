@@ -1,0 +1,3 @@
+* Concatenate application name to Vagrant box name and virtual machine name. This
+  will permit multiple applications to be available through the virtual machine
+  visor.
