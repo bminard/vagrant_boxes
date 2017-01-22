@@ -5,7 +5,9 @@ A Vagrant Box for CentOS
 ========================
 
 The master branch of this repository contains the tools to create a minimal
-CentOS Vagrant box.
+CentOS Vagrant box. Other branches contain different applications:
+
+  - reviewboard defines a basic `Review Board`_ virtual machine
 
 This implementation stores several passwords and key pairs in the credentials
 directory.  This directory is located within the directory used to make the box.
@@ -44,4 +46,5 @@ Run::
 
         > make install all
 
+.. _Review Board: https://www.reviewboard.org
 .. _virtualenv: https://virtualenv.pypa.io/en/stable/
