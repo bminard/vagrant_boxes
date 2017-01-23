@@ -7,7 +7,6 @@ A Vagrant Box for CentOS
 The master branch of this repository contains the tools to create a minimal
 CentOS Vagrant box. Other branches contain different applications:
 
-  - cpython defines a virtual machine for working on `Cpython`_
   - reviewboard defines a basic `Review Board`_ virtual machine
 
 This implementation stores several passwords and key pairs in the credentials
@@ -21,9 +20,15 @@ ks.cfg).  The generated Kickstart file only enough instructions to enable
 Vagrant. Other required instructions are in the scripts identified in the Packer
 template file (centos.json).
 
+=====================
+Build the Vagrant Box
+=====================
+
 -------------
 Prerequisites
 -------------
+
+Install the following prerequisites on the host.
 
   - GNU Make 3.81
   - Packer 0.10.1
@@ -39,14 +44,22 @@ To set up a Python virtual environment run::
   mkvirtualevn vagrant
   workon vagrant
 
+--------
+Building
+--------
+
+On the host, run::
+
+        > make install all
+
 -----
 Using
 -----
 
-Run::
+On the host, run::
 
-        > make install all
+        > vagrant up
+        > vagrant ssh
 
-.. _Cpython: http://cython.org
 .. _Review Board: https://www.reviewboard.org
 .. _virtualenv: https://virtualenv.pypa.io/en/stable/
