@@ -62,6 +62,18 @@ On the host, run::
         > vagrant up
         > vagrant ssh
 
+On the guest, run::
+
+        [vagrant@localhost  ~]$ sudo su -lc "useradd <username>"
+        [vagrant@localhost  ~]$ sudo su -lc "passwd <username>"
+        [vagrant@localhost  ~]$ sudo su -l <username>
+        [username@localhost ~]$ sh /vagrant/personalize.sh <name> <email>
+
+where 
+
+  - <username> is the your login name on the guest
+  - <name> and <email> is used with Mercurial and Git
+
 .. _Cpython: http://cython.org
 .. _Review Board: https://www.reviewboard.org
 .. _virtualenv: https://virtualenv.pypa.io/en/stable/
