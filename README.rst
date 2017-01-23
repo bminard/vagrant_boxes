@@ -20,9 +20,15 @@ ks.cfg).  The generated Kickstart file only enough instructions to enable
 Vagrant. Other required instructions are in the scripts identified in the Packer
 template file (centos.json).
 
+=====================
+Build the Vagrant Box
+=====================
+
 -------------
 Prerequisites
 -------------
+
+Install the following prerequisites on the host.
 
   - GNU Make 3.81
   - Packer 0.10.1
@@ -38,13 +44,22 @@ To set up a Python virtual environment run::
   mkvirtualevn vagrant
   workon vagrant
 
+--------
+Building
+--------
+
+On the host, run::
+
+        > make install all
+
 -----
 Using
 -----
 
-Run::
+On the host, run::
 
-        > make install all
+        > vagrant up
+        > vagrant ssh
 
 .. _Review Board: https://www.reviewboard.org
 .. _virtualenv: https://virtualenv.pypa.io/en/stable/
