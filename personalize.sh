@@ -41,6 +41,13 @@ function build {
 }
 
 
+function devguide {
+	git clone https://github.com/python/devguide.git
+	cd ${HOME}/devguide
+	make html
+}
+
+
 cd ${HOME}
 cat<<_EOF > ${HOME}/.hgrc
 [ui]
@@ -48,4 +55,11 @@ username = ${NAME} ${EMAIL}
 _EOF
 
 
-build 2>&1 | tee output.`date +"%Y_%m_%d_%H_%M"`.log
+git config --global user.name "${NAME}"
+git config --global user.email ${EMAIL}
+
+
+{
+	build
+	devguide
+} 2>&1 | tee output.`date +"%Y_%m_%d_%H_%M"`.log

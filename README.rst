@@ -67,12 +67,19 @@ On the guest, run::
         [vagrant@localhost  ~]$ sudo su -lc "useradd <username>"
         [vagrant@localhost  ~]$ sudo su -lc "passwd <username>"
         [vagrant@localhost  ~]$ sudo su -l <username>
+
+where
+
+  - <username> is the your login name on the guest.
+
+The personalize script downloads and builds Cpython and the Developer Guide. On
+the guest, run::
+
         [username@localhost ~]$ sh /vagrant/personalize.sh <name> <email>
 
-where 
+where
 
-  - <username> is the your login name on the guest
-  - <name> and <email> is used with Mercurial and Git
+  - <name> and <email> is used with Mercurial and Git.
 
 .. _Cpython: http://cython.org
 .. _Review Board: https://www.reviewboard.org

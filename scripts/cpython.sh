@@ -21,3 +21,11 @@ yum --assumeyes install sqlite-devel
 yum --assumeyes install tk-devel
 yum --assumeyes install xz-devel
 yum --assumeyes install zlib-devel
+
+
+# Required by https://docs.python.org/devguide/docquality.html.
+yum --assumeyes install git
+
+# Required to build devguide.
+curl https://bootstrap.pypa.io/get-pip.py | python
+pip install -U Sphinx
