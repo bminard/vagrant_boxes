@@ -29,3 +29,7 @@ yum --assumeyes install git
 # Required to build devguide.
 curl https://bootstrap.pypa.io/get-pip.py | python
 pip install -U Sphinx
+
+
+# Useful tools.
+pip install -U virtualenv

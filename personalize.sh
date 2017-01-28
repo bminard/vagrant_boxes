@@ -28,12 +28,16 @@ readonly EMAIL=${1?"Email address?"}; shift
 
 
 function build {
-	hg clone https://hg.python.org/cpython
-	cd ${HOME}/cpython
-	./configure --with-pydebug
+	readonly BRANCH=default
+
+	cd ${HOME}
+	hg clone -r ${BRANCH} https://hg.python.org/cpython ${HOME}/cpython/src
+	cd ${HOME}/cpython/src
+	./configure --with-pydebug \
+		--prefix=${HOME}/cpython/build/${BRANCH}
 	make -s -j2
 	./python -m test -j3
-
+	make altinstall
 
 	echo **********************************************************
 	echo *** Modules not built: add dependencies to cpython.sh. ***
@@ -42,6 +46,7 @@ function build {
 
 
 function devguide {
+	cd ${HOME}
 	git clone https://github.com/python/devguide.git
 	cd ${HOME}/devguide
 	make html
