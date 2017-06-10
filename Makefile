@@ -26,6 +26,12 @@
 all: check add-box
 
 
+# Unique prefix for Vagrant box name.
+ifndef BOX_NAME
+$(error Use BOX_NAME to name the Vagrant Box.)
+endif
+
+
 PACKER_TEMPLATE?=centos.json
 PACKER_VARS?=centos-vars.json
 TIMESTAMP=timestamp.${PACKER_VARS}
@@ -54,7 +60,7 @@ ${VAGRANT_PRIVATE_KEY} ${VAGRANT_PUBLIC_KEY}: | ${CREDENTIALS_DIR}
 
 
 BUILDER=$(shell packer inspect ${PACKER_TEMPLATE} | sed -ne '/^$$/d' -Ee 's/[[:space:]]*//g' -Ee '/^Builders:/,/^[[:alnum:]]+:/p' | sed -e '/^.*:/d')
-VAGRANT_BOX_NAME=centos-x86_64
+VAGRANT_BOX_NAME=${BOX_NAME}-centos-x86_64
 VAGRANT_BOX=${VAGRANT_BOX_NAME}_virtualbox.box
 .PHONY: add-box create-box destroy-box halt-box
 add-box: destroy-box create-box
