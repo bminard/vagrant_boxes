@@ -51,7 +51,10 @@ Building
 
 On the host, run::
 
-        > make install all
+        > make install all BOX_NAME=foo
+
+BOX_NAME defines a prefix to the Vagrant box name. The remainder of the name identifies
+the operating system and architecture.
 
 -----
 Using
