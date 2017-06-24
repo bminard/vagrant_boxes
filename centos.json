@@ -8,7 +8,7 @@
           "<enter><wait>"
       ],
       "boot_wait": "5s",
-      "guest_os_type": "RedHat_64",
+      "guest_os_type": "{{user `guest_os_type`}}",
       "guest_additions_mode": "disable",
       "headless": false,
       "http_directory": "http",

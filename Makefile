@@ -26,14 +26,25 @@
 all: check add-box
 
 
+# Top-level name for Vagrant box hierarchy.
+ORGANIZATION?=flatfoot
+
+
 # Unique prefix for Vagrant box name.
 ifndef BOX_NAME
 $(error Use BOX_NAME to name the Vagrant Box.)
 endif
 
 
-PACKER_TEMPLATE?=centos.json
-PACKER_VARS?=centos-vars.json
+ifndef PACKER_TEMPLATE
+$(error Use PACKER_TEMPLATE to identify the Packer template used to generate the Vagrant box.)
+endif
+
+ifndef PACKER_VARS
+$(error Use PACKER_VARS to identify the Packer variables requried by PACKER_TEMPLATE.)
+endif
+
+
 TIMESTAMP=timestamp.${PACKER_VARS}
 .PHONY: check
 check: ${TIMESTAMP}
@@ -60,17 +71,20 @@ ${VAGRANT_PRIVATE_KEY} ${VAGRANT_PUBLIC_KEY}: | ${CREDENTIALS_DIR}
 
 
 BUILDER=$(shell packer inspect ${PACKER_TEMPLATE} | sed -ne '/^$$/d' -Ee 's/[[:space:]]*//g' -Ee '/^Builders:/,/^[[:alnum:]]+:/p' | sed -e '/^.*:/d')
-VAGRANT_BOX_NAME=${BOX_NAME}-centos-x86_64
-VAGRANT_BOX=${VAGRANT_BOX_NAME}_virtualbox.box
+BOX_DIR=${ORGANIZATION}/${BOX_NAME}
+${BOX_DIR}:
+	mkdir -p $@ && chown ${WHOAMI}:${GROUP} $@
+VAGRANT_BOX=${BOX_DIR}/${BOX_NAME}_virtualbox.box
 .PHONY: add-box create-box destroy-box halt-box
-add-box: destroy-box create-box
-	vagrant box add --force --name ${VAGRANT_BOX_NAME} file://${VAGRANT_BOX}
+add-box: destroy-box create-box | ${BOX_DIR}
+	vagrant box add --force --name ${BOX_NAME} file://${VAGRANT_BOX}
 	@echo "**************************************************"
 	@echo "*** Use vagrant up to run the virtual machine. ***"
 	@echo "**************************************************"
-create-box: ${BUILDER} Vagrantfile
-Vagrantfile: Vagrantfile.sed
-	vagrant init --minimal ${VAGRANT_BOX_NAME} --output - file://${VAGRANT_BOX} | sed -f $< > $@
+VAGRANT_FILE=${BOX_DIR}/Vagrantfile
+create-box: ${BUILDER} ${VAGRANT_FILE}
+${VAGRANT_FILE}: Vagrantfile.sed ${TIMESTAMP} | ${BOX_DIR}
+	vagrant init --minimal ${BOX_NAME} --output - file://${VAGRANT_BOX} | sed -f $< > $@
 	@echo "******************************************************************"
 	@echo "*** Don't forget to place the Vagrantfile under source control ***"
 	@echo "******************************************************************"
@@ -78,17 +92,17 @@ Vagrantfile: Vagrantfile.sed
 virtualbox-iso: ${VAGRANT_BOX}
 ${VAGRANT_BOX}: ${PACKER_VARS} ${PACKER_TEMPLATE} ${VAGRANT_PRIVATE_KEY}
 	packer build -var 'ssh_private_key=${VAGRANT_PRIVATE_KEY}' \
-	        -var 'vm_name=${VAGRANT_BOX_NAME}' \
+	        -var 'vm_name=${BOX_NAME}' \
 	        -var 'box_name=${VAGRANT_BOX}' \
 		-var-file=${PACKER_VARS} ${PACKER_TEMPLATE}
 destroy-box: halt-box
-	! [ -f Vagrantfile ] || vagrant destroy --force
+	! [ -f ${VAGRANT_FILE} ] || (cd ${BOX_DIR}; vagrant destroy --force)
 
 # The halt-box target does not handle aborted virtual machines because
 # the execution context of this target is unknown. Recovery may be
 # "vagrant up" or "vagrant destroy".
 halt-box:
-	! [ -f Vagrantfile ] || (vagrant status | egrep -q "default[[:space:]]+running" && vagrant halt \
+	! [ -f ${VAGRANT_FILE} ] || (cd ${BOX_DIR}; vagrant status | egrep -q "default[[:space:]]+running" && vagrant halt \
 		|| vagrant status | egrep -q "default[[:space:]]+(poweroff|not created)")
 
 
@@ -119,8 +133,8 @@ realclean: clean
 # Vagrant Box prerequisites and user credentials).
 .PHONY: clean
 clean: destroy-box mostlyclean
-	-vagrant box remove ${VAGRANT_BOX_NAME}
-	-rm -fr ${CREDENTIALS_DIR} ${PRESEED_CONF_DIR} ${VAGRANT_BOX} Vagrantfile
+	-vagrant box remove ${BOX_NAME}
+	-rm -fr ${CREDENTIALS_DIR} ${PRESEED_CONF_DIR} ${VAGRANT_BOX} ${VAGRANT_FILE}
 
 
 # Remove files that are created quickly.
