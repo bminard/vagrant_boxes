@@ -51,10 +51,16 @@ Building
 
 On the host, run::
 
-        > make install all BOX_NAME=foo
+        > make install all BOX_NAME=foo-centos-x86_64 PACKER_TEMPLATE=centos.json PACKER_VARS=centos-x86_64-vars.json
 
-BOX_NAME defines a prefix to the Vagrant box name. The remainder of the name identifies
-the operating system and architecture.
+where
+
+ - BOX_NAME identifies the Vagrant box.
+ - PACKER_TEMPLATE identifies the Packer template used to generate the Vagrant box.
+ - PACKER_VARS identifies the Packer variables requried by PACKER_TEMPLATE.
+
+The above make command creates the Vagrant box foo-centos-x86_64_virtualbox.box--a
+Vagrant box relying on Virtual Box as a provider.
 
 -----
 Using
@@ -62,6 +68,7 @@ Using
 
 On the host, run::
 
+        > cd flatfoot/foo-centos-x86_64 # organization and box name
         > vagrant up
         > vagrant ssh
 
