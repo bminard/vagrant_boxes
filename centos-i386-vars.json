@@ -1,0 +1,6 @@
+{
+  "guest_os_type": "RedHat",
+  "installer_conf": "ks.cfg",
+  "iso_checksum": "bf0e17041aad294fbb3fa5c6fb100258ace4f62b94d5bf3356b40f9807a88805",
+  "iso_url": "http://mirror.centos.org/altarch/7/isos/i386/CentOS-7-i386-Minimal-1611.iso"
+}
