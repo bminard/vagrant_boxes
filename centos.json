@@ -21,6 +21,7 @@
       "ssh_timeout": "600s",
       "shutdown_command": "echo 'vagrant' | sudo -S /sbin/shutdown -hP now",
       "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--description", "{{user `description`}}" ],
         [ "modifyvm", "{{.Name}}", "--usb", "on" ],
         [ "modifyvm", "{{.Name}}", "--memory", "1024" ],
         [ "modifyvm", "{{.Name}}", "--cpus", "1" ]
