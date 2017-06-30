@@ -8,6 +8,7 @@ The master branch of this repository contains the tools to create a minimal
 CentOS Vagrant box. Other branches contain different applications:
 
   - cpython defines a virtual machine for working on `Cpython`_
+  - boost-devel defines a virtual machine for working on `Boost`_
   - reviewboard defines a basic `Review Board`_ virtual machine
 
 This implementation stores several passwords and key pairs in the credentials
@@ -72,6 +73,7 @@ On the host, run::
         > vagrant up
         > vagrant ssh
 
+.. _Boost: http://www.boost.org
 .. _Cpython: http://cython.org
 .. _Review Board: https://www.reviewboard.org
 .. _virtualenv: https://virtualenv.pypa.io/en/stable/
